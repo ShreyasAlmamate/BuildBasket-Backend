@@ -14,7 +14,12 @@ const socket = require('socket.io')
 const http = require('http')
 const server = http.createServer(app)
 app.use(cors({
-    origin : ['http://localhost:3000','http://localhost:3001'],
+    origin : [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        process.env.FRONTEND_URL,
+        process.env.DASHBOARD_URL
+    ].filter(Boolean),
     credentials: true
 }))
 
@@ -158,6 +163,9 @@ app.use('/api/admin',require('./routes/admin/commodityRoutes'))
 app.use('/api/admin',require('./routes/admin/buyerRoutes'))
 app.use('/api/admin',require('./routes/admin/reportsRoutes'))
 app.use('/api/admin',require('./routes/admin/analyticsRoutes'))
+
+// Temporary seeding route (REMOVE AFTER SEEDING)
+app.use('/api',require('./routes/seedRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
 const port = process.env.PORT || 5000
