@@ -18,6 +18,9 @@ app.use(cors({
     credentials: true
 }))
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'))
+
 const io = socket(server, {
     cors: {
         origin: '*',
@@ -137,6 +140,7 @@ app.use('/api',require('./routes/home/cardRoutes'))
 app.use('/api',require('./routes/dashboard/categoryRoutes'))
 app.use('/api',require('./routes/dashboard/productRoutes'))
 app.use('/api',require('./routes/dashboard/sellerRoutes'))
+app.use('/api/seller',require('./routes/dashboard/sellerFeaturesRoutes'))
 app.use('/api',require('./routes/home/customerAuthRoutes'))
 app.use('/api',require('./routes/chatRoutes'))
 app.use('/api',require('./routes/paymentRoutes'))
@@ -150,6 +154,10 @@ app.use('/api/excel',require('./routes/excelRoutes'))
 app.use('/api',require('./routes/admin/adminProductRoutes'))
 app.use('/api',require('./routes/admin/adminCategoryRoutes'))
 app.use('/api/admin/commission',require('./routes/admin/commissionRoutes'))
+app.use('/api/admin',require('./routes/admin/commodityRoutes'))
+app.use('/api/admin',require('./routes/admin/buyerRoutes'))
+app.use('/api/admin',require('./routes/admin/reportsRoutes'))
+app.use('/api/admin',require('./routes/admin/analyticsRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
 const port = process.env.PORT || 5000

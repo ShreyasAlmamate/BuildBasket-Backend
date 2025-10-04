@@ -3,6 +3,7 @@ const router = require('express').Router()
 
 // Customer
 router.post('/home/order/place-order',orderController.place_order) 
+router.post('/home/order/calculate-total',orderController.calculate_order_total)
 router.get('/home/customer/get-dashboard-data/:userId',orderController.get_customer_dashboard_data)
 router.get('/home/customer/get-orders/:customerId/:status',orderController.get_orders)
 router.get('/home/customer/get-order-details/:orderId',orderController.get_order_details)

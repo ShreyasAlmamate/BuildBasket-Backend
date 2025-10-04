@@ -9,8 +9,33 @@ const moment = require("moment")
 const { responseReturn } = require('../../utiles/response') 
 const { mongo: {ObjectId}} = require('mongoose')
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_your_stripe_key_here')
+const { calculateOrderTotal } = require('../../utiles/orderCalculation')
 
 class orderController{
+
+    // Calculate order total with GST and region fare
+    calculate_order_total = async (req, res) => {
+        try {
+            const { products, region } = req.body;
+
+            if (!products || !Array.isArray(products)) {
+                return responseReturn(res, 400, { message: 'Products array is required' });
+            }
+
+            const calculation = await calculateOrderTotal(products, region);
+
+            if (!calculation.success) {
+                return responseReturn(res, 500, { error: calculation.error });
+            }
+
+            responseReturn(res, 200, {
+                success: true,
+                calculation: calculation
+            });
+        } catch (error) {
+            responseReturn(res, 500, { error: error.message });
+        }
+    }
 
     paymentCheck = async (id) => {
         try {

@@ -10,6 +10,7 @@ const productModel = require('../../models/productModel');
 const sellerModel = require('../../models/sellerModel');
 const customerModel = require('../../models/customerModel');
 const bannerModel = require('../../models/bannerModel');
+const commodityModel = require('../../models/commodityModel');
 
 // Configure multer for file uploads - using memory storage to avoid file locking issues
 const storage = multer.memoryStorage();
@@ -543,7 +544,85 @@ class ExcelController {
     }
   };
 
+  // Import Commodities from Excel
+  importCommodities = async (req, res) => {
+    try {
+      if (!req.file) {
+        return responseReturn(res, 400, { message: 'No Excel file uploaded' });
+      }
 
+      // Read Excel file from memory buffer
+      const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const data = XLSX.utils.sheet_to_json(worksheet);
+
+      if (data.length === 0) {
+        return responseReturn(res, 400, { message: 'Excel file is empty' });
+      }
+
+      const results = {
+        success: 0,
+        errors: 0,
+        details: []
+      };
+
+      for (let i = 0; i < data.length; i++) {
+        const row = data[i];
+        try {
+          // Validate required fields
+          if (!row.name || !row.category) {
+            results.errors++;
+            results.details.push(`Row ${i + 2}: Missing required fields (name, category)`);
+            continue;
+          }
+
+          // Check if commodity already exists
+          const existingCommodity = await commodityModel.findOne({ 
+            name: { $regex: new RegExp(`^${row.name}$`, 'i') } 
+          });
+
+          const commodityData = {
+            name: row.name.trim(),
+            category: row.category.trim(),
+            description: row.description?.trim() || '',
+            unit: row.unit?.trim() || 'Unit',
+            basePrice: parseFloat(row.basePrice) || 0,
+            image: row.image || '',
+            tags: row.tags ? row.tags.split(',').map(tag => tag.trim()) : []
+          };
+
+          if (existingCommodity) {
+            // Update existing commodity
+            await commodityModel.findByIdAndUpdate(existingCommodity._id, commodityData);
+            results.success++;
+            results.details.push(`Row ${i + 2}: Updated commodity "${row.name}"`);
+          } else {
+            // Create new commodity
+            await commodityModel.create(commodityData);
+            results.success++;
+            results.details.push(`Row ${i + 2}: Created commodity "${row.name}"`);
+          }
+
+        } catch (error) {
+          results.errors++;
+          results.details.push(`Row ${i + 2}: Error - ${error.message}`);
+        }
+      }
+
+      responseReturn(res, 200, {
+        message: 'Commodities import completed',
+        success: results.success,
+        errors: results.errors,
+        details: results.details,
+        total: results.success + results.errors
+      });
+
+    } catch (error) {
+      console.error('Excel import error:', error);
+      responseReturn(res, 500, { error: error.message });
+    }
+  }
 
 }
 

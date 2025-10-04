@@ -5,6 +5,7 @@ const { adminMiddleware } = require('../middlewares/adminMiddleware');
 
 // Excel import routes (Admin only)
 router.post('/import/categories', adminMiddleware, excelController.uploadExcel, excelController.importCategories);
+router.post('/import/commodities', adminMiddleware, excelController.uploadExcel, excelController.importCommodities);
 router.post('/import/products', adminMiddleware, excelController.uploadExcel, excelController.importProducts);
 router.post('/import/sellers', adminMiddleware, excelController.uploadExcel, excelController.importSellers);
 router.post('/import/customers', adminMiddleware, excelController.uploadExcel, excelController.importCustomers);
