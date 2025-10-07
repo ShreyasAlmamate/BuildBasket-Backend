@@ -2694,5 +2694,10 @@ const seedData = async () => {
   }
 };
 
-// Run seeder
-seedData();
+// Export the function
+module.exports = seedData;
+
+// Run seeder if called directly
+if (require.main === module) {
+  seedData();
+}

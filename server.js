@@ -168,6 +168,32 @@ app.use('/api/admin',require('./routes/admin/analyticsRoutes'))
 // app.use('/api',require('./routes/seedRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
+
+// Test database connection
+app.get('/test-db', async (req, res) => {
+    try {
+        const mongoose = require('mongoose');
+        const connectionState = mongoose.connection.readyState;
+        const states = {
+            0: 'disconnected',
+            1: 'connected',
+            2: 'connecting',
+            3: 'disconnecting'
+        };
+        
+        res.json({
+            status: 'success',
+            connectionState: states[connectionState],
+            dbUrl: process.env.DB_URL ? 'Set' : 'Not Set',
+            cloudinary: process.env.cloud_name ? 'Set' : 'Not Set'
+        });
+    } catch (error) {
+        res.json({
+            status: 'error',
+            error: error.message
+        });
+    }
+})
 const port = process.env.PORT || 5000
 console.log('Environment PORT:', process.env.PORT)
 console.log('Using port:', port)
