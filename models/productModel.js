@@ -91,6 +91,11 @@ const productSchema = new Schema({
         }
     },
     // Using existing category field instead of commodityType
+    // Credit eligibility flag
+    eligibleForCreditSale: {
+        type: Boolean,
+        default: false
+    }
      
 }, {timestamps: true})
 

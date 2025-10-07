@@ -165,7 +165,7 @@ app.use('/api/admin',require('./routes/admin/reportsRoutes'))
 app.use('/api/admin',require('./routes/admin/analyticsRoutes'))
 
 // Temporary seeding route (REMOVE AFTER SEEDING)
-app.use('/api',require('./routes/seedRoutes'))
+// app.use('/api',require('./routes/seedRoutes'))
 
 app.get('/',(req,res) => res.send('Hello Server'))
 const port = process.env.PORT || 5000
